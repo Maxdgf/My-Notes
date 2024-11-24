@@ -1,5 +1,5 @@
 # My-Notes
-Notes android app
+This is a note app. Here you can create notes, view notes, edit and delete notes. This is my first android application where I applied working with databases.
 
 ![](appScreenshots/image1.jpg)
 
