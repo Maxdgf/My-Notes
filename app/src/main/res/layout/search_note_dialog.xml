@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-
+    <!--this layout for new update-->
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="80dp"
