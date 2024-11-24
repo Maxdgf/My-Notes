@@ -178,6 +178,8 @@ class RecyclerViewAdapter(val context:Context, val dataList:ArrayList<NoteData>)
             val dialog = inflater.inflate(R.layout.edit_note_dialog, null)
             val editName = dialog.findViewById<EditText>(R.id.editName)
             val editContent = dialog.findViewById<EditText>(R.id.editContent)
+            editName.setText(nameofNote, TextView.BufferType.EDITABLE)
+            editContent.setText(contentofNote, TextView.BufferType.EDITABLE)
             builder.setView(dialog)
 
             fun editAndUpgrade() {
