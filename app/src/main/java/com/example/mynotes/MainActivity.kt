@@ -5,11 +5,14 @@ import android.content.ContentValues
 import android.content.pm.ActivityInfo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var btnDeleteAllNotes: Button
     lateinit var valuesList: ArrayList<NoteData>
     lateinit var recyclerViewAdapter: RecyclerViewAdapter
+    lateinit var noData: LinearLayout
     //lateinit var btnsearchNote: Button
 
     @SuppressLint("MissingInflatedId")
@@ -42,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         btnOpenNoteCreationDialog = findViewById(R.id.btnCreateNote)
         contentArea = findViewById(R.id.notesView)
         btnDeleteAllNotes = findViewById(R.id.deleteAllNotes)
+        noData = findViewById(R.id.noDataProvider)
         //btnsearchNote = findViewById(R.id.searchNote)
 
         recyclerViewAdapter = RecyclerViewAdapter(this, valuesList)
@@ -52,6 +57,23 @@ class MainActivity : AppCompatActivity() {
 
         val toast = Toast.makeText(this, "Welcome to My Notes!", Toast.LENGTH_LONG)
         toast.show()
+
+        fun checkItemCount() {
+            if (recyclerViewAdapter.itemCount == 0) {
+                noData.visibility = View.VISIBLE
+            } else {
+                noData.visibility = View.INVISIBLE
+            }
+        }
+
+        val mainHandler = Handler(Looper.getMainLooper())
+
+        mainHandler.post(object : Runnable {
+            override fun run() {
+                checkItemCount()
+                mainHandler.postDelayed(this, 1000)
+            }
+        })
 
         fun createDeleteAllNotesDialog() {
             val builder = AlertDialog.Builder(this)
@@ -195,7 +217,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getData() {
-        val database = dbHelper.writableDatabase
+        val database = dbHelper.readableDatabase
         val projection = arrayOf("Id", "NoteName", "NoteContent", "IsChecked", "CheckValue", "DateNow")
         //val sortOrder = "Id, NoteName, NoteContent ASC"
 
