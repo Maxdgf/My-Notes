@@ -14,11 +14,11 @@
         android:layout_height="match_parent">
 
         <CheckBox
+            android:id="@+id/completeChecker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="✖ not completed"
-            android:id="@+id/completeChecker"
             android:background="#FF0000"
+            android:text="✖ not completed"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -74,48 +74,50 @@
                 android:background="@color/white"
                 android:orientation="horizontal">
 
-                <Button
+                <ImageButton
                     android:id="@+id/deleteThisNote"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
                     android:backgroundTint="#FF0000"
-                    android:text="delete"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    app:srcCompat="@android:drawable/ic_menu_delete" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/editThisNote"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
                     android:backgroundTint="#4CAF50"
-                    android:text="edit"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    app:srcCompat="@android:drawable/ic_menu_edit" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/viewThisNote"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
-                    android:backgroundTint="#2196F3"
-                    android:text="view"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:backgroundTint="#03A9F4"
+                    app:srcCompat="@android:drawable/ic_menu_view" />
 
             </LinearLayout>
 
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/checkImageIcon"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@color/white"
-            android:id="@+id/viewFullContent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="?android:attr/actionModeFindDrawable" />
+            app:srcCompat="?attr/actionModePasteDrawable" />
+
+        <ImageView
+            android:id="@+id/noteIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:backgroundTint="@color/white"
+            app:srcCompat="@android:drawable/ic_input_get" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
