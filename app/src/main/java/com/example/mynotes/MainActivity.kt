@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -138,6 +139,7 @@ class MainActivity : AppCompatActivity() {
             achievmentChecker = dialog.findViewById(R.id.createAchievementChecker)
             builder.setView(dialog)
 
+            @SuppressLint("NotifyDataSetChanged")
             fun saveData() {
                 //println("This is a crete note function")
                 try {
@@ -146,7 +148,7 @@ class MainActivity : AppCompatActivity() {
                     var nameData = nameOfNote.text.toString()
                     var contentData = contentOfNote.text.toString()
                     var isChecked = "No"
-                    var checkBoxValue = "notChecked"
+                    var checkBoxValue = "false"
                     val date = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
                     val currentDate = date.format(Date())
                     //test output prints:
@@ -267,28 +269,36 @@ class MainActivity : AppCompatActivity() {
                 dateList = mutableListOf<String>()
                 dateList.add(date)
 
+                val appLog = "My_Notes[fetch data]"
+
                 for (id in idList) {
-                    println(id)
+                    //println(id)
+                    Log.d("$appLog{value: id}", id.toString())
                 }
 
                 for (name in nameList) {
-                    println(name)
+                    //println(name)
+                    Log.d("$appLog{value: name}", name)
                 }
 
                 for (content in contentList) {
-                    println(content)
+                    //println(content)
+                    Log.d("$appLog{value: content}", content)
                 }
 
                 for (checked in checkedList) {
-                    println(checked)
+                    //println(checked)
+                    Log.d("$appLog{value: checked}", checked)
                 }
 
                 for (checkValue in checkList) {
-                    println(checkValue)
+                    //println(checkValue)
+                    Log.d("$appLog{value: checkValue}", checkValue)
                 }
 
                 for (date in dateList) {
-                    println(date)
+                    //println(date)
+                    Log.d("$appLog{value: date}", date)
                 }
 
                 valuesList.add(NoteData(name, "Id: $id", content, checked, checkValue, date))
@@ -296,6 +306,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             cursor.close()
+            database.close()
 
         } catch (e: Exception) {
             println("Oh no!!! fetching data process is crashed:(((")
