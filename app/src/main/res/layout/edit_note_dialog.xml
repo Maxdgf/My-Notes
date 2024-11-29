@@ -4,17 +4,30 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <EditText
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="edit name of note"
-        android:id="@+id/editName" />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:hint="edit note content"
-        android:id="@+id/editContent" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="edit name of note"
+                    android:id="@+id/editName" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp"
+                    android:hint="edit note content"
+                    android:id="@+id/editContent" />
+
+            </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>
