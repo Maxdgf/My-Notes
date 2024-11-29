@@ -10,5 +10,6 @@ This is a note app. Here you can create notes, view notes, edit and delete notes
 ![](appScreenshots/image4screen.jpg)
 
 <h2>Implementations:</h2>
+
 ##
     implementation("androidx.sqlite:sqlite-ktx:2.4.0")
