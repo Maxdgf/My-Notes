@@ -4,26 +4,39 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <EditText
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/inputNameNote"
-        android:layout_marginTop="30dp"
-        android:hint="enter name of your note" />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/inputContentNote"
-        android:layout_marginTop="30dp"
-        android:inputType="textMultiLine"
-        android:hint="enter your text content here" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <CheckBox
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/createAchievementChecker"
-        android:text="create achievement checker"/>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/inputNameNote"
+                android:layout_marginTop="30dp"
+                android:hint="enter name of your note" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/inputContentNote"
+                android:layout_marginTop="30dp"
+                android:inputType="textMultiLine"
+                android:hint="enter your text content here" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/createAchievementChecker"
+                android:text="create achievement checker"/>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 
 </LinearLayout>
