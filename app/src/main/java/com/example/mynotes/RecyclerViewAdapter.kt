@@ -6,9 +6,10 @@ import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -20,12 +21,14 @@ class RecyclerViewAdapter(val context:Context, val dataList:ArrayList<NoteData>)
         val noteName = view.findViewById<TextView>(R.id.noteNameView)
         val noteId = view.findViewById<TextView>(R.id.noteIdView)
         val noteContent = view.findViewById<TextView>(R.id.contentNoteView)
-        val btnViewNote = view.findViewById<Button>(R.id.viewThisNote)
-        val btnDeleteNote = view.findViewById<Button>(R.id.deleteThisNote)
-        val btnEditNote = view.findViewById<Button>(R.id.editThisNote)
+        val btnViewNote = view.findViewById<ImageButton>(R.id.viewThisNote)
+        val btnDeleteNote = view.findViewById<ImageButton>(R.id.deleteThisNote)
+        val btnEditNote = view.findViewById<ImageButton>(R.id.editThisNote)
         var checkedParam = ""
         var checkValue = ""
         val finalCheck = view.findViewById<CheckBox>(R.id.completeChecker)
+        val checkImage = view.findViewById<ImageView>(R.id.checkImageIcon)
+        val icon = view.findViewById<ImageView>(R.id.noteIcon)
         val dateView = view.findViewById<TextView>(R.id.noteDateView)
     }
 
@@ -33,10 +36,6 @@ class RecyclerViewAdapter(val context:Context, val dataList:ArrayList<NoteData>)
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.note_view_widget, parent, false)
         return noteDataViewHolder(view)
-    }
-
-    override fun getItemCount(): Int {
-        return dataList.size
     }
 
     override fun onBindViewHolder(holder: noteDataViewHolder, position: Int) {
@@ -47,9 +46,10 @@ class RecyclerViewAdapter(val context:Context, val dataList:ArrayList<NoteData>)
         holder.noteName.text = list.nameNote
         holder.noteId.text = list.idNote
         holder.noteContent.text = list.contentNote
-        holder.checkedParam = list.isChecked
+        holder.checkedParam = list.Checked
         holder.checkValue = list.checkedValue
         holder.dateView.text = list.dateData
+        holder.finalCheck.setOnCheckedChangeListener(null)
 
         fun checkboxEvent() {
             val database = dbHelper.writableDatabase
@@ -60,7 +60,7 @@ class RecyclerViewAdapter(val context:Context, val dataList:ArrayList<NoteData>)
             val positiveMessage = "Congratulations! You have completed the note '$name'"
             val negativeMessage = "Oh no! don't forget to complete the note '$name'"
             if (checkIndekator == true) {
-                val query = "UPDATE NotesContentTable SET CheckValue = REPLACE(CheckValue, '${holder.checkValue}', 'Checked') WHERE Id LIKE '%$id%'"
+                val query = "UPDATE NotesContentTable SET CheckValue = REPLACE(CheckValue, '${holder.checkValue}', 'true') WHERE Id LIKE '%$id%'"
                 database.execSQL(query)
                 holder.finalCheck.text = "✓ completed"
                 holder.finalCheck.setBackgroundColor(Color.parseColor("#FF4CAF50"))
@@ -68,7 +68,7 @@ class RecyclerViewAdapter(val context:Context, val dataList:ArrayList<NoteData>)
                 toast.show()
                 database.close()
             } else {
-                val query = "UPDATE NotesContentTable SET CheckValue = REPLACE(CheckValue, '${holder.checkValue}', 'notChecked') WHERE Id LIKE '%$id%'"
+                val query = "UPDATE NotesContentTable SET CheckValue = REPLACE(CheckValue, '${holder.checkValue}', 'false') WHERE Id LIKE '%$id%'"
                 database.execSQL(query)
                 holder.finalCheck.text = "✖ not completed"
                 holder.finalCheck.setBackgroundColor(Color.parseColor("#FF0000"))
@@ -83,12 +83,12 @@ class RecyclerViewAdapter(val context:Context, val dataList:ArrayList<NoteData>)
         }
 
         fun checkboxChangeAction() {
-            if (holder.checkValue == "Checked") {
-                holder.finalCheck.isChecked = true
+            if (holder.checkValue.toBoolean()) {
+                holder.finalCheck.isChecked = holder.checkValue.toBoolean()
                 holder.finalCheck.text = "✓ completed"
                 holder.finalCheck.setBackgroundColor(Color.parseColor("#FF4CAF50"))
             } else {
-                holder.finalCheck.isChecked = false
+                holder.finalCheck.isChecked = holder.checkValue.toBoolean()
                 holder.finalCheck.text = "✖ not completed"
                 holder.finalCheck.setBackgroundColor(Color.parseColor("#FF0000"))
             }
@@ -99,8 +99,12 @@ class RecyclerViewAdapter(val context:Context, val dataList:ArrayList<NoteData>)
         fun checkAction() {
             if (holder.checkedParam == "Yes") {
                 holder.finalCheck.visibility = View.VISIBLE
+                holder.checkImage.visibility = View.VISIBLE
+                holder.icon.visibility = View.INVISIBLE
             } else {
                 holder.finalCheck.visibility = View.INVISIBLE
+                holder.checkImage.visibility = View.INVISIBLE
+                holder.icon.visibility = View.VISIBLE
             }
         }
 
@@ -218,5 +222,9 @@ class RecyclerViewAdapter(val context:Context, val dataList:ArrayList<NoteData>)
         holder.btnEditNote.setOnClickListener {
             editNote()
         }
+    }
+
+    override fun getItemCount(): Int {
+        return dataList.size
     }
 }
