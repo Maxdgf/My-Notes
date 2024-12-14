@@ -136,6 +136,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         searchString.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 //recyclerViewAdapter.updateList(valuesList)
+                //filterThis(query)
+                //return true
                 return false
             }
 
@@ -150,6 +152,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     if (it.nameNote.contains(query, true)) {
                         searchFilteredList.add(it)
                         recyclerViewAdapter.updateData(searchFilteredList)
+                        val count = recyclerViewAdapter.itemCount.toString()
+                        notesCount.text = "notes: $count (finded)"
                     }
                 }
             }
