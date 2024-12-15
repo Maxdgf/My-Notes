@@ -235,7 +235,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 database.execSQL(deleteQuery)
                 database.close()
                 val count = recyclerViewAdapter.itemCount.toString()
-                notesCount.text = "all notes: $count"
+                notesCount.text = "all notes: 0"
                 valuesList.clear()
                 searchFilteredList.clear()
                 recyclerViewAdapter.notifyDataSetChanged()
