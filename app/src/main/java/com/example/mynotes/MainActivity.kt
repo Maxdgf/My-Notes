@@ -26,9 +26,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.io.NotActiveException
 import java.text.SimpleDateFormat
 import java.util.Date
 
+@Suppress("NAME_SHADOWING")
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private val dbHelper = DBHelper(this)
@@ -42,24 +44,29 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     lateinit var valuesList: ArrayList<NoteData>
     lateinit var searchFilteredList: ArrayList<NoteData>
     lateinit var recyclerViewAdapter: RecyclerViewAdapter
+    lateinit var upgradedList: ArrayList<NotActiveException>
     lateinit var noData: LinearLayout
     lateinit var nameFont: Spinner
     lateinit var textFont: Spinner
+    lateinit var textAlign: Spinner
     lateinit var searchString: SearchView
     lateinit var nfont: TextView
     lateinit var cfont: TextView
+    lateinit var txtalign: TextView
     lateinit var txtCounter: TextView
     lateinit var notesCount: TextView
 
-    @SuppressLint("MissingInflatedId")
+    @SuppressLint("MissingInflatedId", "NotifyDataSetChanged", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         setContentView(R.layout.activity_main)
 
         valuesList = ArrayList()
 
         searchFilteredList = ArrayList()
+
+        upgradedList = ArrayList()
 
         btnOpenNoteCreationDialog = findViewById(R.id.btnCreateNote)
         contentArea = findViewById(R.id.notesView)
@@ -73,7 +80,124 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         contentArea.adapter = recyclerViewAdapter
         contentArea.setItemViewCacheSize(100000)
 
-        getData()
+        //valuesList.clear()
+        val database = dbHelper.readableDatabase
+        val projection = arrayOf("Id", "NoteName", "NoteContent", "DateNow", "Place", "NameFont", "ContentFont", "TextAlign")
+        //val sortOrder = "Id, NoteName, NoteContent ASC"
+
+        val cursor = database.query("NotesContentTable", projection, null, null, null, null, null)
+
+        try {
+            var id: Int?
+            var name: String?
+            var content: String?
+            var date: String?
+            var place: Int?
+            var nFont: String?
+            var cFont: String?
+            var txtAlign: String?
+
+            var idList: MutableList<Int>
+            var nameList: MutableList<String>
+            var contentList: MutableList<String>
+            var dateList: MutableList<String>
+            var placeList: MutableList<Int>
+            var nFontList: MutableList<String>
+            var cFontList: MutableList<String>
+            var alignList: MutableList<String>
+
+            while (cursor.moveToNext()) {
+                id = cursor.getInt(cursor.getColumnIndexOrThrow("Id"))
+                name = cursor.getString(cursor.getColumnIndexOrThrow("NoteName"))
+                content = cursor.getString(cursor.getColumnIndexOrThrow("NoteContent"))
+                date = cursor.getString(cursor.getColumnIndexOrThrow("DateNow"))
+                place = cursor.getInt(cursor.getColumnIndexOrThrow("Place"))
+                nFont = cursor.getString(cursor.getColumnIndexOrThrow("NameFont"))
+                cFont = cursor.getString(cursor.getColumnIndexOrThrow("ContentFont"))
+                txtAlign = cursor.getString(cursor.getColumnIndexOrThrow("TextAlign"))
+                //test output prints:
+                //println("This is note id: $id")
+                //println("This is note name: $name")
+                //println("This is note content: $content")
+                idList = mutableListOf()
+                idList.add(id)
+                //println(idList)
+                nameList = mutableListOf()
+                nameList.add(name)
+                //println(nameList)
+                contentList = mutableListOf()
+                contentList.add(content)
+                //println(contentList)
+
+                dateList = mutableListOf()
+                dateList.add(date)
+
+                placeList = mutableListOf()
+                placeList.add(place)
+
+                nFontList = mutableListOf()
+                nFontList.add(nFont)
+
+                cFontList = mutableListOf()
+                cFontList.add(cFont)
+
+                alignList = mutableListOf()
+                alignList.add(txtAlign)
+
+                val appLog = "My_Notes[fetch data]"
+
+                for (id in idList) {
+                    //println(id)
+                    Log.d("$appLog{value: id}", id.toString())
+                }
+
+                for (name in nameList) {
+                    //println(name)
+                    Log.d("$appLog{value: name}", name)
+                }
+
+                for (content in contentList) {
+                    //println(content)
+                    Log.d("$appLog{value: content}", content)
+                }
+
+                for (date in dateList) {
+                    //println(date)
+                    Log.d("$appLog{value: date}", date)
+                }
+
+                for (place in placeList) {
+                    //println(place)
+                    Log.d("$appLog{value: place}", place.toString())
+                }
+
+                for (nFont in nFontList) {
+                    //println(nFont)
+                    Log.d("$appLog{value: nameFont}", nFont)
+                }
+
+                for (cFont in cFontList) {
+                    //println(cFont)
+                    Log.d("$appLog{value: contentFont}", cFont)
+                }
+
+                for (txtAlign in alignList) {
+                    //println(txtAlign)
+                    Log.d("$appLog{value: textAlign}", txtAlign)
+                }
+
+                valuesList.add(NoteData(name, "Id: $id", content, date, place, nFont, cFont, txtAlign))
+                //searchFilteredList.clear()
+                recyclerViewAdapter.notifyDataSetChanged()
+            }
+
+            cursor.close()
+            database.close()
+
+        } catch (e: Exception) {
+            println("Oh no!!! fetching data process is crashed:(((")
+            e.printStackTrace()
+        }
 
         val toast = Toast.makeText(this, "Welcome to My Notes!", Toast.LENGTH_LONG)
         toast.show()
@@ -86,7 +210,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
         }
 
-        var mainHandler = Handler(Looper.getMainLooper())
+        val mainHandler = Handler(Looper.getMainLooper())
 
         mainHandler.post(object: Runnable {
             override fun run() {
@@ -95,14 +219,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
         })
 
-        mainHandler.post(object: Runnable {
-            @SuppressLint("SetTextI18n")
-            override fun run() {
-                val count = recyclerViewAdapter.itemCount.toString()
-                notesCount.text = "notes: $count"
-                mainHandler.postDelayed(this, 1500)
-            }
-        })
+        val count = recyclerViewAdapter.itemCount.toString()
+        notesCount.text = "all notes: $count"
 
         fun createDeleteAllNotesDialog() {
             val builder = AlertDialog.Builder(this)
@@ -116,9 +234,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 val deleteQuery = "DELETE FROM NotesContentTable"
                 database.execSQL(deleteQuery)
                 database.close()
+                val count = recyclerViewAdapter.itemCount.toString()
+                notesCount.text = "all notes: $count"
                 valuesList.clear()
                 searchFilteredList.clear()
-                //recyclerViewAdapter.updateList(valuesList)
                 recyclerViewAdapter.notifyDataSetChanged()
             }
 
@@ -134,11 +253,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
 
         searchString.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                //recyclerViewAdapter.updateList(valuesList)
-                //filterThis(query)
-                //return true
-                return false
+            override fun onQueryTextSubmit(query: String): Boolean {
+                filterThis(query)
+                return true
+                //return false
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
@@ -146,14 +264,13 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 return true
             }
 
+            @SuppressLint("SetTextI18n")
             private fun filterThis(query: String) {
                 searchFilteredList.clear()
                 valuesList.forEach {
                     if (it.nameNote.contains(query, true)) {
                         searchFilteredList.add(it)
                         recyclerViewAdapter.updateData(searchFilteredList)
-                        val count = recyclerViewAdapter.itemCount.toString()
-                        notesCount.text = "notes: $count (finded)"
                     }
                 }
             }
@@ -166,26 +283,31 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             val dialog = inflater.inflate(R.layout.edit_text_dialog, null)
             nameOfNote = dialog.findViewById(R.id.inputNameNote)
             contentOfNote = dialog.findViewById(R.id.inputContentNote)
-            achievmentChecker = dialog.findViewById(R.id.createAchievementChecker)
             nameFont = dialog.findViewById(R.id.nameFontSpin)
             textFont = dialog.findViewById(R.id.textFontSpin)
+            textAlign = dialog.findViewById(R.id.textAlignSpin)
             cfont = dialog.findViewById(R.id.cFontView)
             nfont = dialog.findViewById(R.id.nFontView)
             txtCounter = dialog.findViewById(R.id.symbolsCounter)
 
             nameFont.onItemSelectedListener = this
             textFont.onItemSelectedListener = this
+            textAlign.onItemSelectedListener = this
 
             val fonts1 = arrayOf<String?>("sans-serif", "monospace", "serif")
             val fonts2 = arrayOf<String?>("sans-serif", "monospace", "serif")
+            val aligns = arrayOf<String?>("left", "center", "right")
 
             val spinAdapter1: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, fonts1)
             val spinAdapter2: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, fonts2)
+            val alignAdapter: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, aligns)
             spinAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            alignAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
             nameFont.adapter = spinAdapter1
             textFont.adapter = spinAdapter2
+            textAlign.adapter = alignAdapter
 
             contentOfNote.addTextChangedListener(object: TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -216,7 +338,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
             builder.setView(dialog)
 
-            @SuppressLint("NotifyDataSetChanged")
+            @SuppressLint("NotifyDataSetChanged", "SimpleDateFormat")
             fun saveData() {
                 //println("This is a crete note function")
                 try {
@@ -224,31 +346,19 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     val idData = (1000..100000).random().toString()
                     var nameData = nameOfNote.text.toString()
                     var contentData = contentOfNote.text.toString()
-                    var isChecked = "No"
-                    val checkBoxValue = "false"
                     val date = SimpleDateFormat("dd.M.yyyy HH:mm:ss")
                     val currentDate = date.format(Date())
                     val placeIndex = recyclerViewAdapter.itemCount
                     val elCount = recyclerViewAdapter.itemCount
                     val nameFont = nameFont.selectedItem.toString()
                     val contentFont = textFont.selectedItem.toString()
+                    val textAlign = textAlign.selectedItem.toString()
 
                     //test output prints:
                     //println("Note name data: $nameData")
                     //println("Note content data: $contentData")
                     //println("Note id data: $idData)
                     //println(isCheckedData)
-
-
-                    if (achievmentChecker.isChecked) {
-                        isChecked = "Yes"
-                        val toast = Toast.makeText(this, "note '$nameData' was created with a achievment checker!", Toast.LENGTH_LONG)
-                        toast.show()
-                    } else {
-                        isChecked = "No"
-                        val toast = Toast.makeText(this, "note '$nameData' was created without a achievment checker!", Toast.LENGTH_LONG)
-                        toast.show()
-                    }
 
                     val rndNum = (100..5000).random().toString()
                     val rndNum2 = (100..8000).random().toString()
@@ -263,23 +373,22 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                         put("Id", idData)
                         put("NoteName", nameData)
                         put("NoteContent", contentData)
-                        put("IsChecked", isChecked)
-                        put("CheckValue", checkBoxValue)
                         put("DateNow", currentDate)
                         put("Place", placeIndex)
                         put("NameFont", nameFont)
                         put("ContentFont", contentFont)
+                        put("TextAlign", textAlign)
                     }
                     database.insert("NotesContentTable", null, values)
                     database.close()
 
                     contentArea.scrollToPosition(elCount)
 
-                    valuesList.add(NoteData(nameData, "Id: $idData", contentData, isChecked, checkBoxValue, currentDate, placeIndex, nameFont, contentFont))
-                    recyclerViewAdapter.updateList(valuesList)
-                    getData()
-                    //searchFilteredList.clear()
+                    valuesList.add(NoteData(nameData, "Id: $idData", contentData, currentDate, placeIndex, nameFont, contentFont, textAlign))
+                    val count = recyclerViewAdapter.itemCount.toString()
+                    notesCount.text = "all notes: $count"
                     recyclerViewAdapter.notifyDataSetChanged()
+                    //println(valuesList)
 
                 } catch (e: Exception) {
                     println("Data base was not created :(((")
@@ -308,139 +417,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
     }
 
-    fun getData() {
-        val database = dbHelper.readableDatabase
-        val projection = arrayOf("Id", "NoteName", "NoteContent", "IsChecked", "CheckValue", "DateNow", "Place", "NameFont", "ContentFont")
-        //val sortOrder = "Id, NoteName, NoteContent ASC"
-
-        val cursor = database.query("NotesContentTable", projection, null, null, null, null, null)
-
-        try {
-            var id: Int? = null
-            var name: String? = null
-            var content: String? = null
-            var checked: String? = null
-            var checkValue: String? = null
-            var date: String? = null
-            var place: Int? = null
-            var nFont: String? = null
-            var cFont: String? = null
-
-            var idList: MutableList<Int> = mutableListOf()
-            var nameList: MutableList<String> = mutableListOf()
-            var contentList: MutableList<String> = mutableListOf()
-            var checkedList: MutableList<String> = mutableListOf()
-            var checkList: MutableList<String> = mutableListOf()
-            var dateList: MutableList<String> = mutableListOf()
-            var placeList: MutableList<Int> = mutableListOf()
-            var nFontList: MutableList<String> = mutableListOf()
-            var cFontList: MutableList<String> = mutableListOf()
-
-            while (cursor.moveToNext()) {
-                id = cursor.getInt(cursor.getColumnIndexOrThrow("Id"))
-                name = cursor.getString(cursor.getColumnIndexOrThrow("NoteName"))
-                content = cursor.getString(cursor.getColumnIndexOrThrow("NoteContent"))
-                checked = cursor.getString(cursor.getColumnIndexOrThrow("IsChecked"))
-                checkValue = cursor.getString(cursor.getColumnIndexOrThrow("CheckValue"))
-                date = cursor.getString(cursor.getColumnIndexOrThrow("DateNow"))
-                place = cursor.getInt(cursor.getColumnIndexOrThrow("Place"))
-                nFont = cursor.getString(cursor.getColumnIndexOrThrow("NameFont"))
-                cFont = cursor.getString(cursor.getColumnIndexOrThrow("ContentFont"))
-                //test output prints:
-                //println("This is note id: $id")
-                //println("This is note name: $name")
-                //println("This is note content: $content")
-                idList = mutableListOf<Int>()
-                idList.add(id)
-                //println(idList)
-                nameList = mutableListOf<String>()
-                nameList.add(name)
-                //println(nameList)
-                contentList = mutableListOf<String>()
-                contentList.add(content)
-                //println(contentList)
-                checkedList = mutableListOf<String>()
-                checkedList.add(checked)
-
-                checkList = mutableListOf<String>()
-                checkList.add(checkValue)
-
-                dateList = mutableListOf<String>()
-                dateList.add(date)
-
-                placeList = mutableListOf<Int>()
-                placeList.add(place)
-
-                nFontList = mutableListOf<String>()
-                nFontList.add(nFont)
-
-                cFontList = mutableListOf<String>()
-                cFontList.add(cFont)
-
-                val appLog = "My_Notes[fetch data]"
-
-                for (id in idList) {
-                    //println(id)
-                    Log.d("$appLog{value: id}", id.toString())
-                }
-
-                for (name in nameList) {
-                    //println(name)
-                    Log.d("$appLog{value: name}", name)
-                }
-
-                for (content in contentList) {
-                    //println(content)
-                    Log.d("$appLog{value: content}", content)
-                }
-
-                for (checked in checkedList) {
-                    //println(checked)
-                    Log.d("$appLog{value: checked}", checked)
-                }
-
-                for (checkValue in checkList) {
-                    //println(checkValue)
-                    Log.d("$appLog{value: checkValue}", checkValue)
-                }
-
-                for (date in dateList) {
-                    //println(date)
-                    Log.d("$appLog{value: date}", date)
-                }
-
-                for (place in placeList) {
-                    //println(place)
-                    Log.d("$appLog{value: place}", place.toString())
-                }
-
-                for (nFont in nFontList) {
-                    //println(nFont)
-                    Log.d("$appLog{value: nameFont}", nFont)
-                }
-
-                for (cFont in cFontList) {
-                    //println(cFont)
-                    Log.d("$appLog{value: contentFont}", cFont)
-                }
-
-                valuesList.add(NoteData(name, "Id: $id", content, checked, checkValue, date, place, nFont, cFont))
-                //searchFilteredList.clear()
-                recyclerViewAdapter.notifyDataSetChanged()
-            }
-
-            cursor.close()
-            database.close()
-
-        } catch (e: Exception) {
-            println("Oh no!!! fetching data process is crashed:(((")
-            e.printStackTrace()
-        }
-    }
-
+    @SuppressLint("SetTextI18n")
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val Namedata = nameFont.getItemAtPosition(position).toString()
-        val Contentdata = textFont.getItemAtPosition(position).toString()
+        //val Namedata = nameFont.getItemAtPosition(position).toString()
+        //val Contentdata = textFont.getItemAtPosition(position).toString()
         //Toast.makeText(this, " Name font is: $Namedata", Toast.LENGTH_SHORT).show()
         //Toast.makeText(this, "Content font is: $Contentdata", Toast.LENGTH_SHORT).show()
 
@@ -453,20 +433,28 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         val font1 = nameFont.uppercase()
         val font2 = contentFont.uppercase()
 
-        if (font1 == "SERIF") {
-            nameOfNote.typeface = Typeface.SERIF
-        } else if (font1 == "SANS-SERIF") {
-            nameOfNote.typeface = Typeface.SANS_SERIF
-        } else if (font1 == "MONOSPACE") {
-            nameOfNote.typeface = Typeface.MONOSPACE
+        when (font1) {
+            "SERIF" -> {
+                nameOfNote.typeface = Typeface.SERIF
+            }
+            "SANS-SERIF" -> {
+                nameOfNote.typeface = Typeface.SANS_SERIF
+            }
+            "MONOSPACE" -> {
+                nameOfNote.typeface = Typeface.MONOSPACE
+            }
         }
 
-        if (font2 == "SERIF") {
-            contentOfNote.typeface = Typeface.SERIF
-        } else if (font2 == "SANS-SERIF") {
-            contentOfNote.typeface = Typeface.SANS_SERIF
-        } else if (font2 == "MONOSPACE") {
-            contentOfNote.typeface = Typeface.MONOSPACE
+        when (font2) {
+            "SERIF" -> {
+                contentOfNote.typeface = Typeface.SERIF
+            }
+            "SANS-SERIF" -> {
+                contentOfNote.typeface = Typeface.SANS_SERIF
+            }
+            "MONOSPACE" -> {
+                contentOfNote.typeface = Typeface.MONOSPACE
+            }
         }
     }
 
