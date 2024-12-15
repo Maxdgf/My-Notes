@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,25 +9,76 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-            <LinearLayout
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:id="@+id/inputNameNote"
+                android:layout_marginTop="30dp"
+                android:singleLine="true"
+                android:hint="enter name of your note" />
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="edit name of note"
-                    android:id="@+id/editName" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/inputContentNote"
+                android:layout_marginTop="30dp"
+                android:inputType="textMultiLine"
+                android:maxLength="4000"
+                android:hint="enter your text content here" />
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="50dp"
-                    android:hint="edit note content"
-                    android:id="@+id/editContent" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/symbolsCounter"
+                android:textColor="#4CAF50"
+                android:text="symbols: 0/4000"
+                android:textAlignment="center"/>
 
-            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/nFontView"
+                android:layout_marginTop="10dp"
+                android:text="select a name font:"/>
+
+            <Spinner
+                android:id="@+id/nameFontSpin"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:textAlignment="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/cFontView"
+                android:layout_marginTop="10dp"
+                android:text="select a content font:"/>
+
+            <Spinner
+                android:id="@+id/textFontSpin"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:textAlignment="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/aligText"
+                android:layout_marginTop="10dp"
+                android:text="select a text alignment:"/>
+
+            <Spinner
+                android:id="@+id/textAlignSpin"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:textAlignment="center" />
+
+        </LinearLayout>
 
     </ScrollView>
 
