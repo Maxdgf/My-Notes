@@ -12,6 +12,7 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -286,6 +287,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             nameFont = dialog.findViewById(R.id.nameFontSpin)
             textFont = dialog.findViewById(R.id.textFontSpin)
             textAlign = dialog.findViewById(R.id.textAlignSpin)
+            txtalign = dialog.findViewById(R.id.alignText)
             cfont = dialog.findViewById(R.id.cFontView)
             nfont = dialog.findViewById(R.id.nFontView)
             txtCounter = dialog.findViewById(R.id.symbolsCounter)
@@ -417,7 +419,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "RtlHardcoded")
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         //val Namedata = nameFont.getItemAtPosition(position).toString()
         //val Contentdata = textFont.getItemAtPosition(position).toString()
@@ -426,12 +428,15 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         val nameFont = nameFont.selectedItem.toString()
         val contentFont = textFont.selectedItem.toString()
+        val align = textAlign.selectedItem.toString()
 
         cfont.text = "select a content font: ($contentFont)"
         nfont.text = "select a name font: ($nameFont)"
+        txtalign.text = "select a text alignment: ($align)"
 
         val font1 = nameFont.uppercase()
         val font2 = contentFont.uppercase()
+        val txtal = align.uppercase()
 
         when (font1) {
             "SERIF" -> {
@@ -454,6 +459,18 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
             "MONOSPACE" -> {
                 contentOfNote.typeface = Typeface.MONOSPACE
+            }
+        }
+
+        when (txtal) {
+            "CENTER" -> {
+                contentOfNote.gravity = Gravity.CENTER
+            }
+            "LEFT" -> {
+                contentOfNote.gravity = Gravity.LEFT
+            }
+            "RIGHT" -> {
+                contentOfNote.gravity = Gravity.RIGHT
             }
         }
     }
