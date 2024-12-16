@@ -220,8 +220,13 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
         })
 
-        val count = recyclerViewAdapter.itemCount.toString()
-        notesCount.text = "all notes: $count"
+        mainHandler.post(object: Runnable {
+            override fun run() {
+                val count = recyclerViewAdapter.itemCount.toString()
+                notesCount.text = "all notes: $count"
+                mainHandler.postDelayed(this, 1500)
+            }
+        })
 
         fun createDeleteAllNotesDialog() {
             val builder = AlertDialog.Builder(this)
@@ -235,8 +240,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 val deleteQuery = "DELETE FROM NotesContentTable"
                 database.execSQL(deleteQuery)
                 database.close()
-                val count = recyclerViewAdapter.itemCount.toString()
-                notesCount.text = "all notes: 0"
                 valuesList.clear()
                 searchFilteredList.clear()
                 recyclerViewAdapter.notifyDataSetChanged()
@@ -272,6 +275,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     if (it.nameNote.contains(query, true)) {
                         searchFilteredList.add(it)
                         recyclerViewAdapter.updateData(searchFilteredList)
+                        val count = recyclerViewAdapter.itemCount.toString()
+                        notesCount.text = "found notes: $count ($query)"
                     }
                 }
             }
@@ -387,8 +392,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     contentArea.scrollToPosition(elCount)
 
                     valuesList.add(NoteData(nameData, "Id: $idData", contentData, currentDate, placeIndex, nameFont, contentFont, textAlign))
-                    val count = recyclerViewAdapter.itemCount.toString()
-                    notesCount.text = "all notes: $count"
                     recyclerViewAdapter.notifyDataSetChanged()
                     //println(valuesList)
 
