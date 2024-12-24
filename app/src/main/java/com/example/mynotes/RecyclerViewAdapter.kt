@@ -93,9 +93,9 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
         holder.font2 = list.fontContent
         holder.txtfgCol = list.fgTextColor
 
-        val size = context.getString(R.string.size)
+        val sizeTxt = context.getString(R.string.size)
         val length = holder.noteContent.length().toString()
-        holder.lengthView.text = "$size $length"
+        holder.lengthView.text = "$sizeTxt $length"
 
 
         when (holder.txtfgCol) {
@@ -616,8 +616,9 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
                 val content = Html.toHtml(editContent.text)
                 val idData = holder.noteId.text
                 val id = idData.drop(4)
-                val size = editContent.length().toString()
-                holder.lengthView.text = "$size $size"
+                val sizeTxt = editContent.length().toString()
+                val size = context.getString(R.string.size)
+                holder.lengthView.text = "$size $sizeTxt"
 
                 val textAlign = textAlign.selectedItem.toString()
                 when (textAlign) {
