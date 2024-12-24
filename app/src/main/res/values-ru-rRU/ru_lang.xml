@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_notes">Нет заметок!</string>
+    <string name="about">О приложении</string>
+    <string name="quit">Выйти</string>
+    <string name="welcome">Добро пожаловать в MyNotes!</string>
+    <string name="close">Закрыть</string>
+    <string name="notes">заметки:</string>
+    <string name="delete_all_notes">Вы хотите удалить все заметки?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="found_notes">найдено заметок:</string>
+    <string name="create_note">Создать заметку:</string>
+    <string name="symbols">символы:</string>
+    <string name="untitled">Безымянный</string>
+    <string name="empty">Пусто! код ошибки</string>
+    <string name="apply">Принять</string>
+    <string name="cancel">Отменить</string>
+    <string name="select_content_font">выберите шрифт для текста заметки:</string>
+    <string name="select_name_font">выберите шрифт для названия заметки:</string>
+    <string name="select_text_align">выберите ориентацию для текста:</string>
+    <string name="select_bg_or_fg">выберите цвет выделения и цвет текста:</string>
+    <string name="size">размер:</string>
+    <string name="view_note">Просмотр заметки:</string>
+    <string name="edit_note">Редактировать заметку:</string>
+    <string name="delete_note">Удалить заметку:</string>
+    <string name="description">Приложение для создания удобных и стильных заметок!</string>
+    <string name="developed_by">Разработчик:</string>
+    <string name="search">Введите название заметки...</string>
+    <string name="edit_name">редактитровать название заметки</string>
+    <string name="edit_content">редактировать текст заметки</string>
+    <string name="enter_name">введите название заметки</string>
+    <string name="enter_content">введите текст заметки</string>
+</resources>
