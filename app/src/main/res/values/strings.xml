@@ -1,3 +1,34 @@
 <resources>
     <string name="app_name">MyNotes</string>
+    <string name="no_notes">No notes!</string>
+    <string name="about">About</string>
+    <string name="quit">Quit</string>
+    <string name="welcome">Welcome to MyNotes!</string>
+    <string name="close">Close</string>
+    <string name="notes">notes:</string>
+    <string name="delete_all_notes">Do you want to delete all notes?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="found_notes">found notes:</string>
+    <string name="create_note">Create note:</string>
+    <string name="symbols">symbols:</string>
+    <string name="untitled">Untitled</string>
+    <string name="empty">Empty! error code</string>
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
+    <string name="select_content_font">select a content font:</string>
+    <string name="select_name_font">select a name font:</string>
+    <string name="select_text_align">select a text alignment:</string>
+    <string name="select_bg_or_fg">select a text bg or fg color:</string>
+    <string name="size">size:</string>
+    <string name="view_note">View note:</string>
+    <string name="edit_note">Edit note:</string>
+    <string name="delete_note">Delete note:</string>
+    <string name="description">Application for creating convenient and stylish notes!</string>
+    <string name="developed_by">Developed by:</string>
+    <string name="search">Enter name of note...</string>
+    <string name="edit_name">edit note name</string>
+    <string name="edit_content">edit note content</string>
+    <string name="enter_name">enter note name</string>
+    <string name="enter_content">enter note content</string>
 </resources>
