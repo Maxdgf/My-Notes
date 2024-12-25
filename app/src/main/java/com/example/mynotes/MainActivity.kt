@@ -238,9 +238,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         searchString.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                filterThis(query)
-                return true
-                //return false
+                return false
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
@@ -250,15 +248,29 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
             @SuppressLint("SetTextI18n")
             private fun filterThis(query: String) {
+
+                if (query.isEmpty()) {
+                    recyclerViewAdapter.updateData(valuesList)
+                    return
+                }
+
                 searchFilteredList.clear()
+
                 valuesList.forEach {
                     if (it.nameNote.contains(query, true)) {
                         searchFilteredList.add(it)
-                        recyclerViewAdapter.updateData(searchFilteredList)
-                        val count = recyclerViewAdapter.itemCount.toString()
-                        val message = getString(R.string.found_notes)
-                        notesCount.text = "$message $count ($query)"
                     }
+                }
+                recyclerViewAdapter.updateData(searchFilteredList)
+
+                if (searchFilteredList.isNotEmpty()) {
+                    val message = getString(R.string.found_notes)
+                    val count = recyclerViewAdapter.itemCount.toString()
+                    notesCount.text = "$message $count ($query)"
+                    Toast.makeText(this@MainActivity, "$message ($query)", Toast.LENGTH_SHORT).show()
+                } else {
+                    val message2 = getString(R.string.not_found)
+                    Toast.makeText(this@MainActivity, "$message2 ($query)", Toast.LENGTH_SHORT).show()
                 }
             }
         })
