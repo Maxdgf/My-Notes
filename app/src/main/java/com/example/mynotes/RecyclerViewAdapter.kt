@@ -130,6 +130,12 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             "dkgray" -> {
                 holder.noteContent.setTextColor(Color.DKGRAY)
             }
+            "blue" -> {
+                holder.noteContent.setTextColor(Color.BLUE)
+            }
+            "transparent" -> {
+                holder.noteContent.setTextColor(Color.TRANSPARENT)
+            }
         }
 
         when (holder.align) {
