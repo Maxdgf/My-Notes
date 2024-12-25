@@ -471,6 +471,14 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
                         foreText.setSelection(2)
                         editContent.setTextColor(Color.DKGRAY)
                     }
+                    "blue" -> {
+                        foreText.setSelection(6)
+                        editContent.setTextColor(Color.BLUE)
+                    }
+                    "transparent" -> {
+                        foreText.setSelection(10)
+                        editContent.setTextColor(Color.TRANSPARENT)
+                    }
                 }
 
                 when (txtAlign) {
