@@ -195,7 +195,6 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             val searchDialog = inflater.inflate(R.layout.activity_main, null)
             val searchString = searchDialog.findViewById<SearchView>(R.id.searcher)
             searchString.clearFocus()
-            searchString.setQuery("", false)
             searchString.isIconified = true
             val idData = holder.noteId.text
             val id = idData.drop(4)
@@ -311,7 +310,6 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             val searchDialog = inflater.inflate(R.layout.activity_main, null)
             val searchString = searchDialog.findViewById<SearchView>(R.id.searcher)
             searchString.clearFocus()
-            searchString.setQuery("", false)
             searchString.isIconified = true
             builder.setView(dialog)
 
@@ -370,7 +368,6 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             val searchDialog = inflater.inflate(R.layout.activity_main, null)
             val searchString = searchDialog.findViewById<SearchView>(R.id.searcher)
             searchString.clearFocus()
-            searchString.setQuery("", false)
             searchString.isIconified = true
             editName = dialog.findViewById(R.id.editName)
             editContent = dialog.findViewById(R.id.editContent)
