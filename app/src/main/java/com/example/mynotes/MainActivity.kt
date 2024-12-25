@@ -2,6 +2,7 @@ package com.example.mynotes
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
+import android.content.Context
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.Typeface
@@ -209,6 +210,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             val inflater = layoutInflater
             val message = getString(R.string.delete_all_notes)
             searchString.clearFocus()
+            searchString.setQuery("", false)
+            searchString.isIconified = true
             builder.setTitle(message)
             val dialog = inflater.inflate(R.layout.apply_all_delete_dialog, null)
             builder.setView(dialog)
@@ -278,6 +281,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             val inflater = layoutInflater
             val message = getString(R.string.create_note)
             searchString.clearFocus()
+            searchString.setQuery("", false)
+            searchString.isIconified = true
             builder.setTitle(message)
             val dialog = inflater.inflate(R.layout.edit_text_dialog, null)
             nameOfNote = dialog.findViewById(R.id.inputNameNote)
@@ -304,8 +309,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             val fonts1 = arrayOf<String?>("sans-serif", "monospace", "serif")
             val fonts2 = arrayOf<String?>("sans-serif", "monospace", "serif")
             val aligns = arrayOf<String?>("left", "center", "right")
-            val colors = arrayOf<String?>("yellow", "magenta", "dkgray", "black", "cyan", "green", "blue", "gray", "ltgray", "red", "transperent", "white")
-            val textcolors = arrayOf<String?>("black", "magenta", "dkgray", "yellow", "cyan", "green", "blue", "gray", "ltgray", "red", "transperent", "white")
+            val colors = arrayOf<String?>("yellow", "magenta", "dkgray", "black", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
+            val textcolors = arrayOf<String?>("black", "magenta", "dkgray", "yellow", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
 
             val spinAdapter1: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, fonts1)
             val spinAdapter2: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, fonts2)
