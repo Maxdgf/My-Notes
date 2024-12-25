@@ -31,4 +31,5 @@
     <string name="edit_content">edit note content</string>
     <string name="enter_name">enter note name</string>
     <string name="enter_content">enter note content</string>
+    <string name="not_found">notes not found:</string>
 </resources>
