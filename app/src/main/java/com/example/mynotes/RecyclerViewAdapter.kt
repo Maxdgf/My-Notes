@@ -270,6 +270,12 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
                     "dkgray" -> {
                         noteWin.setTextColor(Color.DKGRAY)
                     }
+                    "blue" -> {
+                        noteWin.setTextColor(Color.BLUE)
+                    }
+                    "transparent" -> {
+                        noteWin.setTextColor(Color.TRANSPARENT)
+                    }
                 }
 
                 val view = context.getString(R.string.view_note)
