@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.SearchView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -185,6 +186,11 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             //val content = holder.noteContent.text
             //noteWin.text = content
             noteWin.movementMethod = ScrollingMovementMethod()
+            val searchDialog = inflater.inflate(R.layout.activity_main, null)
+            val searchString = searchDialog.findViewById<SearchView>(R.id.searcher)
+            searchString.clearFocus()
+            searchString.setQuery("", false)
+            searchString.isIconified = true
             val idData = holder.noteId.text
             val id = idData.drop(4)
 
@@ -290,6 +296,11 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             val delete = context.getString(R.string.delete_note)
             builder.setTitle("$delete '$name' ?")
             val dialog = inflater.inflate(R.layout.apply_delete_note, null)
+            val searchDialog = inflater.inflate(R.layout.activity_main, null)
+            val searchString = searchDialog.findViewById<SearchView>(R.id.searcher)
+            searchString.clearFocus()
+            searchString.setQuery("", false)
+            searchString.isIconified = true
             builder.setView(dialog)
 
             fun searchToDelete() {
@@ -344,6 +355,11 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             builder.setTitle(edit)
             val inflater = layoutInflater
             val dialog = inflater.inflate(R.layout.edit_note_dialog, null)
+            val searchDialog = inflater.inflate(R.layout.activity_main, null)
+            val searchString = searchDialog.findViewById<SearchView>(R.id.searcher)
+            searchString.clearFocus()
+            searchString.setQuery("", false)
+            searchString.isIconified = true
             editName = dialog.findViewById(R.id.editName)
             editContent = dialog.findViewById(R.id.editContent)
             val idData = holder.noteId.text
@@ -372,8 +388,8 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             val fonts1 = arrayOf<String?>("sans-serif", "monospace", "serif")
             val fonts2 = arrayOf<String?>("sans-serif", "monospace", "serif")
             val aligns = arrayOf<String?>("left", "center", "right")
-            val colors = arrayOf<String?>("yellow", "magenta", "dkgray", "black", "cyan", "green", "blue", "gray", "ltgray", "red", "transperent", "white")
-            val textcolors = arrayOf<String?>("black", "magenta", "dkgray", "yellow", "cyan", "green", "blue", "gray", "ltgray", "red", "transperent", "white")
+            val colors = arrayOf<String?>("yellow", "magenta", "dkgray", "black", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
+            val textcolors = arrayOf<String?>("black", "magenta", "dkgray", "yellow", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
 
             val spinAdapter1: ArrayAdapter<*> = ArrayAdapter<Any?>(context, android.R.layout.simple_spinner_item, fonts1)
             val spinAdapter2: ArrayAdapter<*> = ArrayAdapter<Any?>(context, android.R.layout.simple_spinner_item, fonts2)
