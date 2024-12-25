@@ -31,4 +31,5 @@
     <string name="edit_content">редактировать текст заметки</string>
     <string name="enter_name">введите название заметки</string>
     <string name="enter_content">введите текст заметки</string>
+    <string name="not_found">заметки не найдены:</string>
 </resources>
