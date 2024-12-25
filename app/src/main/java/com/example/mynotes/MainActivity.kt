@@ -210,7 +210,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             val inflater = layoutInflater
             val message = getString(R.string.delete_all_notes)
             searchString.clearFocus()
-            searchString.setQuery("", false)
             searchString.isIconified = true
             builder.setTitle(message)
             val dialog = inflater.inflate(R.layout.apply_all_delete_dialog, null)
@@ -281,7 +280,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             val inflater = layoutInflater
             val message = getString(R.string.create_note)
             searchString.clearFocus()
-            searchString.setQuery("", false)
             searchString.isIconified = true
             builder.setTitle(message)
             val dialog = inflater.inflate(R.layout.edit_text_dialog, null)
@@ -431,7 +429,6 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     val date = SimpleDateFormat("dd.M.yyyy HH:mm:ss")
                     val currentDate = date.format(Date())
                     val placeIndex = recyclerViewAdapter.itemCount
-                    val elCount = recyclerViewAdapter.itemCount
                     val nameFont = nameFont.selectedItem.toString()
                     val contentFont = textFont.selectedItem.toString()
                     val textAlign = textAlign.selectedItem.toString()
@@ -468,10 +465,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     database.insert("NotesContentTable", null, values)
                     database.close()
 
+                    val elCount = recyclerViewAdapter.itemCount
                     contentArea.scrollToPosition(elCount)
 
                     valuesList.add(NoteData(nameData, "Id: $idData", contentData, currentDate, placeIndex, nameFont, contentFont, textAlign, textFgColor))
                     recyclerViewAdapter.notifyDataSetChanged()
+                    //recyclerViewAdapter.notifyItemInserted(valuesList.size - 1)
                     //println(valuesList)
 
                 } catch (e: Exception) {
