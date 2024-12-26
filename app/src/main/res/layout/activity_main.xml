@@ -23,6 +23,15 @@
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="0dp">
 
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_gravity="right"
+                android:layout_marginRight="15dp"
+                android:background="#FF5722"
+                android:id="@+id/btnMenu"
+                app:srcCompat="@drawable/three_dots_menu"
+                app:tint="#FFFFFF"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -31,7 +40,7 @@
                 android:text="My Notes"
                 android:textColor="@color/white"
                 android:textSize="35sp"
-                android:layout_marginRight="30dp"
+                android:layout_marginRight="20dp"
                 android:layout_gravity="right"
                 tools:ignore="RtlHardcoded"/>
 
@@ -39,7 +48,7 @@
                 android:id="@+id/searcher"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:queryHint="Enter note name..."
+                android:queryHint="@string/search"
                 android:searchHintIcon="@drawable/search_icon"
                 android:searchIcon="@drawable/search_icon" />
 
@@ -63,6 +72,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:backgroundTint="#FF5722"
+            android:layout_marginLeft="5dp"
             android:contentDescription="create a note"
             app:srcCompat="@android:drawable/ic_input_add"
             app:tint="#FFFFFF" />
@@ -73,6 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:backgroundTint="#FF0000"
+            android:layout_marginRight="5dp"
             android:contentDescription="delete all notes"
             app:tint="#FFFFFF"
             app:srcCompat="@android:drawable/ic_delete" />
@@ -102,7 +113,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="all notes: 0"
+            android:text="notes: 0"
             android:id="@+id/notesCount"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -126,19 +137,18 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:srcCompat="@drawable/folder"
             tools:layout_editor_absoluteX="110dp"
-            tools:layout_editor_absoluteY="358dp"
-            app:tint="#000000" />
+            tools:layout_editor_absoluteY="358dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No data :("
-            android:textSize="40sp"
-            android:fontFamily="serif"/>
+            android:text="@string/no_notes"
+            android:textSize="25sp"
+            android:fontFamily="@font/acme"/>
 
     </LinearLayout>
 
