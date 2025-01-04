@@ -1,5 +1,5 @@
 # My-Notes
-<marquee>Android application for creating your stylish notes!</marquee>
+<center>Android application for creating your stylish notes!</center>
 
 
 ![](app_icon.png)
