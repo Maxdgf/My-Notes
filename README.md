@@ -1,5 +1,5 @@
 # My-Notes
-<ul>Android application for creating your stylish notes!</ul>
+<li>Android application for creating your stylish notes!</li>
 
 
 
