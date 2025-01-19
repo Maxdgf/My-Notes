@@ -25,4 +25,5 @@ My-Notes is an intuitive Android application designed to help you create stylish
 
 To get started, add the following dependency in your `build.gradle` file:
 
-implementation("androidx.sqlite:sqlite-ktx:2.4.0")
+##
+    implementation("androidx.sqlite:sqlite-ktx:2.4.0")
