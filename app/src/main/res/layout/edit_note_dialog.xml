@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <ScrollView
@@ -17,19 +17,18 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/inputNameNote"
-                android:layout_marginTop="30dp"
+                android:hint="@string/edit_name"
                 android:singleLine="true"
-                android:hint="enter name of your note" />
+                android:id="@+id/editName" />
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/inputContentNote"
-                android:layout_marginTop="30dp"
-                android:inputType="textMultiLine"
+                android:layout_marginTop="50dp"
                 android:maxLength="4000"
-                android:hint="enter your text content here" />
+                android:hint="@string/edit_content"
+                android:inputType="textMultiLine"
+                android:id="@+id/editContent" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -39,44 +38,150 @@
                 android:text="symbols: 0/4000"
                 android:textAlignment="center"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/nFontView"
-                android:layout_marginTop="10dp"
-                android:text="select a name font:"/>
-
-            <Spinner
-                android:id="@+id/nameFontSpin"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:textAlignment="center" />
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/cFontView"
-                android:layout_marginTop="10dp"
-                android:text="select a content font:"/>
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
 
-            <Spinner
-                android:id="@+id/textFontSpin"
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    app:tint="@color/orange"
+                    app:srcCompat="@drawable/customization_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/customization"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="5dp"/>
+
+                <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="5dp"
+                    android:background="@color/orange"
+                    android:id="@+id/customOpen"
+                    app:srcCompat="@android:drawable/ic_menu_view" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:textAlignment="center" />
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/aligText"
-                android:layout_marginTop="10dp"
-                android:text="select a text alignment:"/>
+                android:id="@+id/customizationPanel"
+                android:background="@drawable/action_btns_panel_bg"
+                android:orientation="vertical">
 
-            <Spinner
-                android:id="@+id/textAlignSpin"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:textAlignment="center" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textColorsView"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="5dp"
+                    android:text="select a text bg or fg color:"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/action_btns_panel_bg"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginTop="2dp"
+                            android:id="@+id/textBgColorView"
+                            app:srcCompat="@drawable/marker_icon" />
+
+                        <Spinner
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@drawable/action_btns_panel_bg"
+                            android:id="@+id/colorTextSpin"
+                            android:textAlignment="center"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/textFgColorView"
+                            app:srcCompat="@drawable/text_color_icon" />
+
+                        <Spinner
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@drawable/action_btns_panel_bg"
+                            android:id="@+id/colorTextSpin2"
+                            android:textAlignment="center"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/nFontView"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="5dp"
+                    android:text="select a name font:"/>
+
+                <Spinner
+                    android:id="@+id/nameFontSpin"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/action_btns_panel_bg"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/cFontView"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="5dp"
+                    android:text="select a content font:"/>
+
+                <Spinner
+                    android:id="@+id/textFontSpin"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/action_btns_panel_bg"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/alignText"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="5dp"
+                    android:text="select a text alignment:"/>
+
+                <Spinner
+                    android:id="@+id/textAlignSpin"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/action_btns_panel_bg"
+                    android:textAlignment="center" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
