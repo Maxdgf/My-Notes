@@ -5,35 +5,39 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.text.Editable
 import android.text.Html
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.Spanned
 import android.text.TextWatcher
 import android.text.method.ScrollingMovementMethod
 import android.text.style.BackgroundColorSpan
-import android.text.style.ForegroundColorSpan
+import android.text.util.Linkify
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.SearchView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
-class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>): RecyclerView.Adapter<RecyclerViewAdapter.noteDataViewHolder>(), AdapterView.OnItemSelectedListener {
+class RecyclerViewAdapter(private val context:Context, private var dataList:ArrayList<NoteData>): RecyclerView.Adapter<RecyclerViewAdapter.noteDataViewHolder>(), AdapterView.OnItemSelectedListener {
 
     private lateinit var nameFont: Spinner
     private lateinit var textFont: Spinner
@@ -49,24 +53,34 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
     private lateinit var editContent: EditText
     private lateinit var editName: EditText
     private lateinit var txtCounter: TextView
+    private lateinit var customizePanel: LinearLayout
+    private lateinit var customOpen: ImageButton
+    private lateinit var colorAdapter: ColorsAdapter
+    private lateinit var textColorAdapter: TextColorsAdapter
+    private lateinit var colorsNamesList: MutableList<String>
+    private lateinit var textColorsNamesList: MutableList<String>
+    private lateinit var upgradedList: ArrayList<NoteData>
 
-    inner class noteDataViewHolder(val view: View): RecyclerView.ViewHolder(view) {
-        val noteName = view.findViewById<TextView>(R.id.noteNameView)
-        val noteId = view.findViewById<TextView>(R.id.noteIdView)
-        val noteContent = view.findViewById<TextView>(R.id.contentNoteView)
-        val btnViewNote = view.findViewById<ImageButton>(R.id.viewThisNote)
-        val btnDeleteNote = view.findViewById<ImageButton>(R.id.deleteThisNote)
-        val btnEditNote = view.findViewById<ImageButton>(R.id.editThisNote)
-        val btnCopyNote = view.findViewById<ImageButton>(R.id.copyThisNote)
+    private var isCustomizationPanelOpened = false
+
+    inner class noteDataViewHolder(private val view: View): RecyclerView.ViewHolder(view) {
+        val noteName: TextView = view.findViewById(R.id.noteNameView)
+        val noteId: TextView = view.findViewById(R.id.noteIdView)
+        val noteContent: TextView = view.findViewById(R.id.contentNoteView)
+        val btnViewNote: ImageButton = view.findViewById(R.id.viewThisNote)
+        val btnDeleteNote: ImageButton = view.findViewById(R.id.deleteThisNote)
+        val btnEditNote: ImageButton = view.findViewById(R.id.editThisNote)
+        val btnCopyNote: ImageButton = view.findViewById(R.id.copyThisNote)
         var font1 = ""
         var font2 = ""
         var align = ""
         var placeIdString = ""
         var placeId = 0
         var txtfgCol = ""
-        val dateView = view.findViewById<TextView>(R.id.noteDateView)
-        val noteNum = view.findViewById<TextView>(R.id.noteNumber)
-        val lengthView = view.findViewById<TextView>(R.id.sizeViewer)
+        val dateView: TextView = view.findViewById(R.id.noteDateView)
+        val noteNum: TextView = view.findViewById(R.id.noteNumber)
+        val lengthView: TextView = view.findViewById(R.id.sizeViewer)
+        val shareNote: ImageButton = view.findViewById(R.id.shareThisNote)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): noteDataViewHolder {
@@ -75,7 +89,7 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
         return noteDataViewHolder(view)
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "RtlHardcoded", "InflateParams", "MissingInflatedId")
     override fun onBindViewHolder(holder: noteDataViewHolder, position: Int) {
 
         val dbHelper = DBHelper(context)
@@ -94,10 +108,14 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
         holder.font2 = list.fontContent
         holder.txtfgCol = list.fgTextColor
 
+
+        Linkify.addLinks(holder.noteContent, Linkify.ALL)
+
         val sizeTxt = context.getString(R.string.size)
         val length = holder.noteContent.length().toString()
         holder.lengthView.text = "$sizeTxt $length"
 
+        val clickAnimation = AnimationUtils.loadAnimation(context, R.anim.click_button)
 
         when (holder.txtfgCol) {
             "yellow" -> {
@@ -180,6 +198,22 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             }
         }
 
+        fun shareCurrentNote() {
+            val name = holder.noteName.text.toString()
+            val content = holder.noteContent.text.toString()
+
+            val textToSend = "$name\n\n$content";
+
+            val shareMessage = context.getString(R.string.share_note)
+
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.type="text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT, textToSend)
+            context.startActivity(Intent.createChooser(shareIntent, shareMessage))
+        }
+
+        @SuppressLint("MissingInflatedId")
         fun viewNote() {
             val database = dbHelper.readableDatabase
             val layoutInflater: LayoutInflater = LayoutInflater.from(context)
@@ -188,6 +222,7 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             //val name = holder.noteName.text
             val dialog = inflater.inflate(R.layout.note_viewer_window, null)
             val noteWin = dialog.findViewById<TextView>(R.id.viewNoteWindow)
+            val noteNameViewer = dialog.findViewById<TextView>(R.id.viewNoteName)
             builder.setView(dialog)
             //val content = holder.noteContent.text
             //noteWin.text = content
@@ -199,12 +234,13 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             val idData = holder.noteId.text
             val id = idData.drop(4)
 
-            val projection = arrayOf("Id", "NoteName", "NoteContent", "ContentFont", "TextAlign", "TextFgColor")
+            val projection = arrayOf("Id", "NoteName", "NoteContent", "ContentFont", "TextAlign", "TextFgColor", "NameFont")
 
             val selection = "Id = $id"
             val cursor = database.query("NotesContentTable", projection, selection, null, null, null, null)
 
             var cFont = ""
+            var nFont = ""
             var txtAlign = ""
             var txtColFg = ""
             var name = ""
@@ -212,6 +248,7 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
 
             while (cursor.moveToNext()) {
                 cFont = cursor.getString(cursor.getColumnIndexOrThrow("ContentFont"))
+                nFont = cursor.getString(cursor.getColumnIndexOrThrow("NameFont"))
                 txtAlign = cursor.getString(cursor.getColumnIndexOrThrow("TextAlign"))
                 txtColFg = cursor.getString(cursor.getColumnIndexOrThrow("TextFgColor"))
                 name = cursor.getString(cursor.getColumnIndexOrThrow("NoteName"))
@@ -241,6 +278,21 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
                     }
                     else -> {
                         noteWin.typeface = Typeface.SERIF
+                    }
+                }
+
+                when (nFont) {
+                    "monospace" -> {
+                        noteNameViewer.typeface = Typeface.MONOSPACE
+                    }
+                    "serif" -> {
+                        noteNameViewer.typeface = Typeface.SERIF
+                    }
+                    "sans-serif" -> {
+                        noteNameViewer.typeface = Typeface.SANS_SERIF
+                    }
+                    else -> {
+                        noteNameViewer.typeface = Typeface.SERIF
                     }
                 }
 
@@ -284,8 +336,11 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
                 }
 
                 val view = context.getString(R.string.view_note)
-                builder.setTitle("$view '$name'")
+                builder.setTitle(view)
+                noteNameViewer.text = name
+                noteNameViewer.isSelected = true
                 noteWin.text = Html.fromHtml(content)
+                Linkify.addLinks(noteWin, Linkify.ALL)
             }
 
             cursor.close()
@@ -387,6 +442,9 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             bgColorViewer = dialog.findViewById(R.id.textBgColorView)
             fgColorViewer = dialog.findViewById(R.id.textFgColorView)
             txtCounter = dialog.findViewById(R.id.symbolsCounter)
+            customizePanel = dialog.findViewById(R.id.customizationPanel)
+            customizePanel.visibility = View.GONE
+            customOpen = dialog.findViewById(R.id.customOpen)
 
             nameFont.onItemSelectedListener = this
             textFont.onItemSelectedListener = this
@@ -397,19 +455,48 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             val fonts1 = arrayOf<String?>("sans-serif", "monospace", "serif")
             val fonts2 = arrayOf<String?>("sans-serif", "monospace", "serif")
             val aligns = arrayOf<String?>("left", "center", "right")
-            val colors = arrayOf<String?>("yellow", "magenta", "dkgray", "black", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
-            val textcolors = arrayOf<String?>("black", "magenta", "dkgray", "yellow", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
+
+            val colorsList = arrayListOf(
+                ColorItemData("#FFFF00", "yellow"),
+                ColorItemData("#FF00FF", "magenta"),
+                ColorItemData("#A9A9A9", "dkgray"),
+                ColorItemData("#000000", "black"),
+                ColorItemData("#00FFFF", "cyan"),
+                ColorItemData("#008000", "green"),
+                ColorItemData("#0000FF", "blue"),
+                ColorItemData("#808080", "gray"),
+                ColorItemData("#D3D3D3", "ltgray"),
+                ColorItemData("#FF0000", "red"),
+                ColorItemData("#00000000", "transparent"),
+                ColorItemData("#FFFFFF", "white"),
+            )
+            colorsNamesList = mutableListOf("yellow", "magenta", "dkgray", "black", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
+
+            val textColorsList = arrayListOf(
+                ColorItemData("#000000", "black"),
+                ColorItemData("#FF00FF", "magenta"),
+                ColorItemData("#A9A9A9", "dkgray"),
+                ColorItemData("#FFFF00", "yellow"),
+                ColorItemData("#00FFFF", "cyan"),
+                ColorItemData("#008000", "green"),
+                ColorItemData("#0000FF", "blue"),
+                ColorItemData("#808080", "gray"),
+                ColorItemData("#D3D3D3", "ltgray"),
+                ColorItemData("#FF0000", "red"),
+                ColorItemData("#00000000", "transparent"),
+                ColorItemData("#FFFFFF", "white"),
+            )
+            textColorsNamesList = mutableListOf("black", "magenta", "dkgray", "yellow", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
 
             val spinAdapter1: ArrayAdapter<*> = ArrayAdapter<Any?>(context, android.R.layout.simple_spinner_item, fonts1)
             val spinAdapter2: ArrayAdapter<*> = ArrayAdapter<Any?>(context, android.R.layout.simple_spinner_item, fonts2)
             val alignAdapter: ArrayAdapter<*> = ArrayAdapter<Any?>(context, android.R.layout.simple_spinner_item, aligns)
-            val colorAdapter: ArrayAdapter<*> = ArrayAdapter<Any?>(context, android.R.layout.simple_spinner_item, colors)
-            val textColorAdapter: ArrayAdapter<*> = ArrayAdapter<Any?>(context, android.R.layout.simple_spinner_item, textcolors)
             spinAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             alignAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            colorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            textColorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+            colorAdapter = ColorsAdapter(context, colorsList)
+            textColorAdapter = TextColorsAdapter(context, textColorsList)
 
             nameFont.adapter = spinAdapter1
             textFont.adapter = spinAdapter2
@@ -550,6 +637,22 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
             cursor.close()
             database.close()
 
+            val clickedAnimation = AnimationUtils.loadAnimation(context, R.anim.click_button)
+            val fadeInPanelAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in)
+
+            customOpen.setOnClickListener {
+                isCustomizationPanelOpened = !isCustomizationPanelOpened
+
+                customOpen.startAnimation(clickedAnimation)
+
+                if (isCustomizationPanelOpened) {
+                    customizePanel.visibility = View.VISIBLE
+                    customizePanel.startAnimation(fadeInPanelAnimation)
+                } else {
+                    customizePanel.visibility = View.GONE
+                }
+            }
+
             editContent.setOnLongClickListener {
                 val startText = editContent.selectionStart
                 val endText = editContent.selectionEnd
@@ -559,7 +662,8 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
                 }
 
                 val spannable = SpannableStringBuilder(editContent.text)
-                val txtColor = textColor.selectedItem.toString()
+                val txtColorPos = textColor.selectedItemPosition
+                val txtColor = colorsNamesList[txtColorPos]
 
                 if (isOverPlace(spannable, startText, endText)) {
                     removeOverPlace(spannable, startText, endText)
@@ -653,6 +757,8 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
                 val size = context.getString(R.string.size)
                 holder.lengthView.text = "$size $sizeTxt"
 
+                isCustomizationPanelOpened = false
+
                 val textAlign = textAlign.selectedItem.toString()
                 when (textAlign) {
                     "left" -> {
@@ -666,7 +772,8 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
                     }
                 }
 
-                val foreColor = foreText.selectedItem.toString()
+                val foreColorPos = foreText.selectedItemPosition
+                val foreColor = textColorsNamesList[foreColorPos]
                 when (foreColor) {
                     "yellow" -> {
                         holder.noteContent.setTextColor(Color.YELLOW)
@@ -732,18 +839,35 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
                     }
                 }
 
-                holder.noteName.text = name
-                holder.noteContent.text = Html.fromHtml(content)
-                println(Html.fromHtml(content))
-                val updateNoteQuery = "UPDATE NotesContentTable SET NoteName = '$name', NoteContent = '$content', TextAlign = '$textAlign', TextFgColor = '$foreColor', ContentFont = '$contentFont', NameFont = '$nameFont' WHERE Id = '$id'"
-                database.execSQL(updateNoteQuery)
-                database.close()
+                val errorMessage = context.getString(R.string.edit_error)
+                val errorMessage2 = context.getString(R.string.edit_error_second)
+
+                if (name.isNotEmpty() && content.isNotEmpty()) {
+                    holder.noteName.text = name
+                    holder.noteContent.text = Html.fromHtml(content)
+                    list.nameNote = name.toString()
+                    list.contentNote = content
+                    list.textAlign = textAlign
+                    list.fgTextColor = foreColor
+                    list.fontContent = contentFont
+                    list.fontName = nameFont
+                    Linkify.addLinks(holder.noteContent, Linkify.ALL)
+
+                    //println(Html.fromHtml(content))
+                    val updateNoteQuery = "UPDATE NotesContentTable SET NoteName = '$name', NoteContent = '$content', TextAlign = '$textAlign', TextFgColor = '$foreColor', ContentFont = '$contentFont', NameFont = '$nameFont' WHERE Id = '$id'"
+                    database.execSQL(updateNoteQuery)
+                    database.close()
+                } else {
+                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, errorMessage2, Toast.LENGTH_SHORT).show()
+                }
             }
 
             val cancel = context.getString(R.string.cancel)
             val apply = context.getString(R.string.apply)
 
             builder.setNegativeButton(cancel) { dialog, which ->
+                isCustomizationPanelOpened = false
                 dialog.dismiss()
             }
 
@@ -764,19 +888,28 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
         }
 
         holder.btnViewNote.setOnClickListener {
+            holder.btnViewNote.startAnimation(clickAnimation)
             viewNote()
         }
 
         holder.btnDeleteNote.setOnClickListener {
+            holder.btnDeleteNote.startAnimation(clickAnimation)
             deleteNote()
         }
 
         holder.btnEditNote.setOnClickListener {
+            holder.btnEditNote.startAnimation(clickAnimation)
             editNote()
         }
 
         holder.btnCopyNote.setOnClickListener {
+            holder.btnCopyNote.startAnimation(clickAnimation)
             copyNote()
+        }
+
+        holder.shareNote.setOnClickListener {
+            holder.shareNote.startAnimation(clickAnimation)
+            shareCurrentNote()
         }
     }
 
@@ -795,8 +928,12 @@ class RecyclerViewAdapter(val context:Context, var dataList:ArrayList<NoteData>)
         val nameFont = nameFont.selectedItem
         val contentFont = textFont.selectedItem.toString()
         val align = textAlign.selectedItem.toString()
-        val textcolor = textColor.selectedItem.toString()
-        val foretext = foreText.selectedItem.toString()
+
+        val textcolorPos = textColor.selectedItemPosition
+        val textcolor = colorsNamesList[textcolorPos]
+
+        val foretextPos = foreText.selectedItemPosition
+        val foretext = textColorsNamesList[foretextPos]
 
         val select1 = context.getString(R.string.select_content_font)
         val select2 = context.getString(R.string.select_name_font)
