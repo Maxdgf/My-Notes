@@ -3,4 +3,16 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="orange">#FF5722</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="magenta">#9C27B0</color>
+    <color name="dkgray">#4C4C4C</color>
+    <color name="cyan">#00BCD4</color>
+    <color name="green">#4CAF50</color>
+    <color name="blue">#2196F3</color>
+    <color name="gray">#878787</color>
+    <color name="ltgray">#B5B5B5</color>
+    <color name="red">#FF0000</color>
+    <color name="transparent">#00000000</color>
+    <color name="grass">#009542</color>
+    <color name="sky">#3EC3FF</color>
 </resources>
