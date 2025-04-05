@@ -71,21 +71,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:backgroundTint="#FF5722"
+            android:backgroundTint="@color/orange"
             android:layout_marginLeft="5dp"
             android:contentDescription="create a note"
             app:srcCompat="@android:drawable/ic_input_add"
-            app:tint="#FFFFFF" />
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/btnCreateAudioNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:backgroundTint="@color/grass"
+            android:contentDescription="delete all notes"
+            app:tint="@color/white"
+            app:srcCompat="@android:drawable/ic_btn_speak_now" />
 
         <ImageButton
             android:id="@+id/deleteAllNotes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:backgroundTint="#FF0000"
+            android:backgroundTint="@color/red"
             android:layout_marginRight="5dp"
             android:contentDescription="delete all notes"
-            app:tint="#FFFFFF"
+            app:tint="@color/white"
             app:srcCompat="@android:drawable/ic_delete" />
 
     </LinearLayout>
