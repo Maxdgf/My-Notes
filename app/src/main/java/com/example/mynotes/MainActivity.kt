@@ -2,24 +2,26 @@ package com.example.mynotes
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
-import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
+import android.speech.RecognizerIntent
 import android.text.Editable
 import android.text.Html
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.text.style.BackgroundColorSpan
-import android.text.style.StyleSpan
-import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -33,17 +35,26 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
+import java.util.Objects
 
 @Suppress("NAME_SHADOWING")
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private val dbHelper = DBHelper(this)
+
+    private companion object {
+        private const val REQUEST_SPEECH_INPUT_CODE = 1
+    }
+
+    private var recognizedContent: String = ""
+
+    private var isCustomizationPanelOpened = false
 
     private lateinit var btnOpenNoteCreationDialog: ImageButton
     private lateinit var contentArea: RecyclerView
@@ -69,6 +80,13 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     lateinit var txtCounter: TextView
     lateinit var notesCount: TextView
     private lateinit var menuBtn: ImageButton
+    private lateinit var btnSpeechRecognizer: ImageButton
+    private lateinit var customizationPanel: LinearLayout
+    private lateinit var customOpen: ImageButton
+    private lateinit var colorAdapter: ColorsAdapter
+    private lateinit var textColorAdapter: TextColorsAdapter
+    private lateinit var colorsNamesList: MutableList<String>
+    private lateinit var textColorsNamesList: MutableList<String>
 
     @SuppressLint("MissingInflatedId", "NotifyDataSetChanged", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,6 +105,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         searchString = findViewById(R.id.searcher)
         notesCount = findViewById(R.id.notesCount)
         menuBtn = findViewById(R.id.btnMenu)
+        btnSpeechRecognizer = findViewById(R.id.btnCreateAudioNote)
 
         recyclerViewAdapter = RecyclerViewAdapter(this, valuesList)
         contentArea.layoutManager = LinearLayoutManager(this)
@@ -275,243 +294,333 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
         })
 
-        fun isOverPlace(spannable: Spannable, start: Int, end: Int): Boolean {
-            val spans = spannable.getSpans(start, end, Any::class.java)
-            return spans.isNotEmpty()
-        }
+        fun speechToTextDialog() {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
 
-        fun removeOverPlace(spannable: Spannable, start: Int, end: Int) {
-            val spans = spannable.getSpans(start, end, Any::class.java)
-            for (span in spans) {
-                spannable.removeSpan(span)
+            val speak = getString(R.string.speak)
+
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, speak)
+
+            try {
+                startActivityForResult(intent, REQUEST_SPEECH_INPUT_CODE)
+                val speechMessage = getString(R.string.speech_input)
+                Toast.makeText(this, speechMessage, Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, e.message, Toast.LENGTH_SHORT).show()
             }
         }
 
-        fun createNoteDialog() {
-            val builder = AlertDialog.Builder(this)
-            val inflater = layoutInflater
-            val message = getString(R.string.create_note)
-            searchString.clearFocus()
-            searchString.isIconified = true
-            builder.setTitle(message)
-            val dialog = inflater.inflate(R.layout.edit_text_dialog, null)
-            nameOfNote = dialog.findViewById(R.id.inputNameNote)
-            contentOfNote = dialog.findViewById(R.id.inputContentNote)
-            nameFont = dialog.findViewById(R.id.nameFontSpin)
-            textFont = dialog.findViewById(R.id.textFontSpin)
-            textAlign = dialog.findViewById(R.id.textAlignSpin)
-            textColor = dialog.findViewById(R.id.colorTextSpin)
-            foreText = dialog.findViewById(R.id.colorTextSpin2)
-            txtalign = dialog.findViewById(R.id.alignText)
-            cfont = dialog.findViewById(R.id.cFontView)
-            nfont = dialog.findViewById(R.id.nFontView)
-            textColors = dialog.findViewById(R.id.textColorsView)
-            txtCounter = dialog.findViewById(R.id.symbolsCounter)
-            bgColorViewer = dialog.findViewById(R.id.textBgColorView)
-            fgColorViewer = dialog.findViewById(R.id.textFgColorView)
-
-            nameFont.onItemSelectedListener = this
-            textFont.onItemSelectedListener = this
-            textAlign.onItemSelectedListener = this
-            textColor.onItemSelectedListener = this
-            foreText.onItemSelectedListener = this
-
-            val fonts1 = arrayOf<String?>("sans-serif", "monospace", "serif")
-            val fonts2 = arrayOf<String?>("sans-serif", "monospace", "serif")
-            val aligns = arrayOf<String?>("left", "center", "right")
-            val colors = arrayOf<String?>("yellow", "magenta", "dkgray", "black", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
-            val textcolors = arrayOf<String?>("black", "magenta", "dkgray", "yellow", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
-
-            val spinAdapter1: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, fonts1)
-            val spinAdapter2: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, fonts2)
-            val alignAdapter: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, aligns)
-            val colorAdapter: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, colors)
-            val textColorAdapter: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, textcolors)
-            spinAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            alignAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            colorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            textColorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-            nameFont.adapter = spinAdapter1
-            textFont.adapter = spinAdapter2
-            textAlign.adapter = alignAdapter
-            textColor.adapter = colorAdapter
-            foreText.adapter = textColorAdapter
-
-            contentOfNote.addTextChangedListener(object: TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                }
-
-                @SuppressLint("SetTextI18n")
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    if (s != null) {
-                        val symCount = s.length
-                        val symCountText = s.length.toString()
-                        val description = getString(R.string.symbols)
-                        txtCounter.text = "$description $symCountText/4000"
-                        //println(symCount)
-
-                        if (symCount == 4000) {
-                            txtCounter.setTextColor(Color.parseColor("#FFFF0000"))
-                        } else if (symCount >= 2000){
-                            txtCounter.setTextColor(Color.parseColor("#FFD400"))
-                        } else {
-                            txtCounter.setTextColor(Color.parseColor("#4CAF50"))
-                        }
-                    }
-                }
-
-                override fun afterTextChanged(s: Editable?) {
-                }
-
-            })
-
-            contentOfNote.setOnLongClickListener {
-                val startText = contentOfNote.selectionStart
-                val endText = contentOfNote.selectionEnd
-
-                if (startText < 0 || endText < 0) {
-                    return@setOnLongClickListener false
-                }
-
-                val spannable = SpannableStringBuilder(contentOfNote.text)
-                val txtColor = textColor.selectedItem.toString()
-
-                if (isOverPlace(spannable, startText, endText)) {
-                    removeOverPlace(spannable, startText, endText)
-                }
-
-                when (txtColor) {
-                    "yellow" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.YELLOW), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "magenta" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.MAGENTA), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "dkgray" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.DKGRAY), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "black" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.BLACK), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "cyan" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.CYAN), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "green" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.GREEN), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "blue" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.BLUE), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "gray" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.GRAY), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "ltgray" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.LTGRAY), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "red" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.RED), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "transparent" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.TRANSPARENT), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                    "white" -> {
-                        spannable.setSpan(BackgroundColorSpan(Color.WHITE), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    }
-                }
-
-                //println("$startText/$endText")
-
-                contentOfNote.text = spannable
-
-                true
-            }
-
-            builder.setView(dialog)
-
-            @SuppressLint("NotifyDataSetChanged", "SimpleDateFormat")
-            fun saveData() {
-                //println("This is a crete note function")
-                try {
-                    val database = dbHelper.writableDatabase
-                    val idData = (1000..100000).random().toString()
-                    var nameData = nameOfNote.text.toString()
-                    var contentData = Html.toHtml(contentOfNote.text)
-                    val date = SimpleDateFormat("dd.M.yyyy HH:mm:ss")
-                    val currentDate = date.format(Date())
-                    val placeIndex = recyclerViewAdapter.itemCount
-                    val nameFont = nameFont.selectedItem.toString()
-                    val contentFont = textFont.selectedItem.toString()
-                    val textAlign = textAlign.selectedItem.toString()
-                    var textFgColor = foreText.selectedItem.toString()
-
-                    //test output prints:
-                    //println("Note name data: $nameData")
-                    //println("Note content data: $contentData")
-                    //println("Note id data: $idData)
-                    //println(isCheckedData)
-
-                    val rndNum = (100..5000).random().toString()
-                    val rndNum2 = (100..8000).random().toString()
-                    if (nameData.isEmpty()) {
-                        val untitled = getString(R.string.untitled)
-                        nameData = "$untitled$rndNum"
-                    }
-                    if (contentData.isEmpty()) {
-                        val empty = getString(R.string.empty)
-                        contentData = "$empty ($rndNum2)"
-                    }
-
-                    val values = ContentValues().apply {
-                        put("Id", idData)
-                        put("NoteName", nameData)
-                        put("NoteContent", contentData)
-                        put("DateNow", currentDate)
-                        put("Place", placeIndex)
-                        put("NameFont", nameFont)
-                        put("ContentFont", contentFont)
-                        put("TextAlign", textAlign)
-                        put("TextFgColor", textFgColor)
-                    }
-                    database.insert("NotesContentTable", null, values)
-                    database.close()
-
-                    val elCount = recyclerViewAdapter.itemCount
-                    contentArea.scrollToPosition(elCount)
-
-                    valuesList.add(NoteData(nameData, "Id: $idData", contentData, currentDate, placeIndex, nameFont, contentFont, textAlign, textFgColor))
-                    recyclerViewAdapter.notifyDataSetChanged()
-                    //recyclerViewAdapter.notifyItemInserted(valuesList.size - 1)
-                    //println(valuesList)
-
-                } catch (e: Exception) {
-                    println("Data base was not created :(((")
-                    e.printStackTrace()
-                }
-            }
-
-            val apply = getString(R.string.apply)
-            val cancel = getString(R.string.cancel)
-
-            builder.setPositiveButton(apply) { dialog, which ->
-                saveData()
-            }
-
-            builder.setNegativeButton(cancel) { dialog, which ->
-                dialog.dismiss()
-            }
-
-            builder.show()
-        }
+        val clickAnimation = AnimationUtils.loadAnimation(this, R.anim.click_button)
 
         btnOpenNoteCreationDialog.setOnClickListener {
+            btnOpenNoteCreationDialog.startAnimation(clickAnimation)
             createNoteDialog()
         }
 
         btnDeleteAllNotes.setOnClickListener {
+            btnDeleteAllNotes.startAnimation(clickAnimation)
             createDeleteAllNotesDialog()
         }
+
+        btnSpeechRecognizer.setOnClickListener {
+            btnSpeechRecognizer.startAnimation(clickAnimation)
+            speechToTextDialog()
+        }
+    }
+
+    private fun createNoteDialog() {
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        val message = getString(R.string.create_note)
+        searchString.clearFocus()
+        searchString.isIconified = true
+        builder.setTitle(message)
+        val dialog = inflater.inflate(R.layout.edit_text_dialog, null)
+        nameOfNote = dialog.findViewById(R.id.inputNameNote)
+        contentOfNote = dialog.findViewById(R.id.inputContentNote)
+        nameFont = dialog.findViewById(R.id.nameFontSpin)
+        textFont = dialog.findViewById(R.id.textFontSpin)
+        textAlign = dialog.findViewById(R.id.textAlignSpin)
+        textColor = dialog.findViewById(R.id.colorTextSpin)
+        foreText = dialog.findViewById(R.id.colorTextSpin2)
+        txtalign = dialog.findViewById(R.id.alignText)
+        cfont = dialog.findViewById(R.id.cFontView)
+        nfont = dialog.findViewById(R.id.nFontView)
+        textColors = dialog.findViewById(R.id.textColorsView)
+        txtCounter = dialog.findViewById(R.id.symbolsCounter)
+        bgColorViewer = dialog.findViewById(R.id.textBgColorView)
+        fgColorViewer = dialog.findViewById(R.id.textFgColorView)
+        customizationPanel = dialog.findViewById(R.id.customizationPanel)
+        customizationPanel.visibility = View.GONE
+        customOpen = dialog.findViewById(R.id.customOpen)
+
+        nameFont.onItemSelectedListener = this
+        textFont.onItemSelectedListener = this
+        textAlign.onItemSelectedListener = this
+        textColor.onItemSelectedListener = this
+        foreText.onItemSelectedListener = this
+
+        val fonts1 = arrayOf<String?>("sans-serif", "monospace", "serif")
+        val fonts2 = arrayOf<String?>("sans-serif", "monospace", "serif")
+        val aligns = arrayOf<String?>("left", "center", "right")
+
+        val colorsList = arrayListOf(
+            ColorItemData("#FFFF00", "yellow"),
+            ColorItemData("#FF00FF", "magenta"),
+            ColorItemData("#A9A9A9", "dkgray"),
+            ColorItemData("#000000", "black"),
+            ColorItemData("#00FFFF", "cyan"),
+            ColorItemData("#008000", "green"),
+            ColorItemData("#0000FF", "blue"),
+            ColorItemData("#808080", "gray"),
+            ColorItemData("#D3D3D3", "ltgray"),
+            ColorItemData("#FF0000", "red"),
+            ColorItemData("#00000000", "transparent"),
+            ColorItemData("#FFFFFF", "white"),
+        )
+        colorsNamesList = mutableListOf("yellow", "magenta", "dkgray", "black", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
+
+        val textColorsList = arrayListOf(
+            ColorItemData("#000000", "black"),
+            ColorItemData("#FF00FF", "magenta"),
+            ColorItemData("#A9A9A9", "dkgray"),
+            ColorItemData("#FFFF00", "yellow"),
+            ColorItemData("#00FFFF", "cyan"),
+            ColorItemData("#008000", "green"),
+            ColorItemData("#0000FF", "blue"),
+            ColorItemData("#808080", "gray"),
+            ColorItemData("#D3D3D3", "ltgray"),
+            ColorItemData("#FF0000", "red"),
+            ColorItemData("#00000000", "transparent"),
+            ColorItemData("#FFFFFF", "white"),
+        )
+        textColorsNamesList = mutableListOf("black", "magenta", "dkgray", "yellow", "cyan", "green", "blue", "gray", "ltgray", "red", "transparent", "white")
+
+
+        val spinAdapter1: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, fonts1)
+        val spinAdapter2: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, fonts2)
+        val alignAdapter: ArrayAdapter<*> = ArrayAdapter<Any?>(this, android.R.layout.simple_spinner_item, aligns)
+        spinAdapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinAdapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        alignAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        colorAdapter = ColorsAdapter(this, colorsList)
+        textColorAdapter = TextColorsAdapter(this, textColorsList)
+
+        nameFont.adapter = spinAdapter1
+        textFont.adapter = spinAdapter2
+        textAlign.adapter = alignAdapter
+        textColor.adapter = colorAdapter
+        foreText.adapter = textColorAdapter
+
+        val clickAnimation = AnimationUtils.loadAnimation(this, R.anim.click_button)
+        val fadeInPanelAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_in)
+
+        if (recognizedContent.isNotEmpty()) {
+            contentOfNote.setText(recognizedContent)
+            recognizedContent = "";
+        }
+
+        contentOfNote.addTextChangedListener(object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            @SuppressLint("SetTextI18n")
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s != null) {
+                    val symCount = s.length
+                    val symCountText = s.length.toString()
+                    val description = getString(R.string.symbols)
+                    txtCounter.text = "$description $symCountText/4000"
+                    //println(symCount)
+
+                    if (symCount == 4000) {
+                        txtCounter.setTextColor(Color.parseColor("#FFFF0000"))
+                    } else if (symCount >= 2000){
+                        txtCounter.setTextColor(Color.parseColor("#FFD400"))
+                    } else {
+                        txtCounter.setTextColor(Color.parseColor("#4CAF50"))
+                    }
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+            }
+
+        })
+
+        customOpen.setOnClickListener {
+            isCustomizationPanelOpened = !isCustomizationPanelOpened
+
+            customOpen.startAnimation(clickAnimation)
+
+            if (isCustomizationPanelOpened) {
+                customizationPanel.visibility = View.VISIBLE
+                customizationPanel.startAnimation(fadeInPanelAnimation)
+            } else {
+                customizationPanel.visibility = View.GONE
+            }
+
+            println(isCustomizationPanelOpened)
+        }
+
+        contentOfNote.setOnLongClickListener {
+            val startText = contentOfNote.selectionStart
+            val endText = contentOfNote.selectionEnd
+
+            if (startText < 0 || endText < 0) {
+                return@setOnLongClickListener false
+            }
+
+            val spannable = SpannableStringBuilder(contentOfNote.text)
+            val txtColorPos = textColor.selectedItemPosition
+            val txtColor = colorsNamesList[txtColorPos]
+
+            fun isOverPlace(spannable: Spannable, start: Int, end: Int): Boolean {
+                val spans = spannable.getSpans(start, end, Any::class.java)
+                return spans.isNotEmpty()
+            }
+
+            fun removeOverPlace(spannable: Spannable, start: Int, end: Int) {
+                val spans = spannable.getSpans(start, end, Any::class.java)
+                for (span in spans) {
+                    spannable.removeSpan(span)
+                }
+            }
+
+            if (isOverPlace(spannable, startText, endText)) {
+                removeOverPlace(spannable, startText, endText)
+            }
+
+            when (txtColor) {
+                "yellow" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.YELLOW), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "magenta" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.MAGENTA), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "dkgray" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.DKGRAY), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "black" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.BLACK), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "cyan" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.CYAN), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "green" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.GREEN), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "blue" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.BLUE), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "gray" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.GRAY), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "ltgray" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.LTGRAY), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "red" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.RED), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "transparent" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.TRANSPARENT), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+                "white" -> {
+                    spannable.setSpan(BackgroundColorSpan(Color.WHITE), startText, endText, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+            }
+
+            //println("$startText/$endText")
+
+            contentOfNote.text = spannable
+
+            true
+        }
+
+        builder.setView(dialog)
+
+        @SuppressLint("NotifyDataSetChanged", "SimpleDateFormat")
+        fun saveData() {
+            //println("This is a crete note function")
+            try {
+                val database = dbHelper.writableDatabase
+                val idData = (1000..100000).random().toString()
+                var nameData = nameOfNote.text.toString()
+                var contentData = Html.toHtml(contentOfNote.text)
+                val date = SimpleDateFormat("dd.M.yyyy HH:mm:ss")
+                val currentDate = date.format(Date())
+                val placeIndex = recyclerViewAdapter.itemCount
+                val nameFont = nameFont.selectedItem.toString()
+                val contentFont = textFont.selectedItem.toString()
+                val textAlign = textAlign.selectedItem.toString()
+                val textFgColorPos = foreText.selectedItemPosition
+                val textFgColor = textColorsNamesList[textFgColorPos]
+
+                //test output prints:
+                //println("Note name data: $nameData")
+                //println("Note content data: $contentData")
+                //println("Note id data: $idData)
+                //println(isCheckedData)
+                //println(textFgColor)
+
+                val rndNum = (100..5000).random().toString()
+                val rndNum2 = (100..8000).random().toString()
+                if (nameData.isEmpty()) {
+                    val untitled = getString(R.string.untitled)
+                    nameData = "$untitled$rndNum"
+                }
+                if (contentData.isEmpty()) {
+                    val empty = getString(R.string.empty)
+                    contentData = "$empty ($rndNum2)"
+                }
+
+                isCustomizationPanelOpened = false
+
+                val values = ContentValues().apply {
+                    put("Id", idData)
+                    put("NoteName", nameData)
+                    put("NoteContent", contentData)
+                    put("DateNow", currentDate)
+                    put("Place", placeIndex)
+                    put("NameFont", nameFont)
+                    put("ContentFont", contentFont)
+                    put("TextAlign", textAlign)
+                    put("TextFgColor", textFgColor)
+                }
+                //println(values)
+                database.insert("NotesContentTable", null, values)
+                database.close()
+
+                val elCount = recyclerViewAdapter.itemCount
+                contentArea.scrollToPosition(elCount)
+
+                valuesList.add(NoteData(nameData, "Id: $idData", contentData, currentDate, placeIndex, nameFont, contentFont, textAlign, textFgColor))
+                recyclerViewAdapter.notifyDataSetChanged()
+                //recyclerViewAdapter.notifyItemInserted(valuesList.size - 1)
+                //println(valuesList)
+
+            } catch (e: Exception) {
+                println("Data base was not created :(((")
+                e.printStackTrace()
+            }
+        }
+
+        val apply = getString(R.string.apply)
+        val cancel = getString(R.string.cancel)
+
+        builder.setPositiveButton(apply) { dialog, which ->
+            saveData()
+        }
+
+        builder.setNegativeButton(cancel) { dialog, which ->
+            isCustomizationPanelOpened = false
+            dialog.dismiss()
+        }
+
+        builder.show()
     }
 
     @SuppressLint("SetTextI18n", "RtlHardcoded")
@@ -520,8 +629,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         val nameFont = nameFont.selectedItem.toString()
         val contentFont = textFont.selectedItem.toString()
         val align = textAlign.selectedItem.toString()
-        val textcolor = textColor.selectedItem.toString()
-        val foretext = foreText.selectedItem.toString()
+
+        val textcolorPos = textColor.selectedItemPosition
+        val textcolor = colorsNamesList[textcolorPos]
+
+        val foretextPos = foreText.selectedItemPosition
+        val foretext = textColorsNamesList[foretextPos]
 
         val select1 = getString(R.string.select_content_font)
         val select2 = getString(R.string.select_name_font)
@@ -662,5 +775,23 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
         Toast.makeText(this, "Create note", Toast.LENGTH_SHORT).show()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_SPEECH_INPUT_CODE) {
+            if (resultCode == RESULT_OK && data != null) {
+                val res: ArrayList<String> = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
+
+                val speechMessage = getString(R.string.speech_input_second)
+
+                //println(Objects.requireNonNull(res)[0])
+                recognizedContent = Objects.requireNonNull(res)[0]
+                createNoteDialog()
+                Toast.makeText(this, speechMessage, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
