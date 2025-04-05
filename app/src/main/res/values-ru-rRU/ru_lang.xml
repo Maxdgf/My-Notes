@@ -32,4 +32,12 @@
     <string name="enter_name">введите название заметки</string>
     <string name="enter_content">введите текст заметки</string>
     <string name="not_found">заметки не найдены:</string>
+    <string name="clear_all">очистить</string>
+    <string name="customization">кастомизация</string>
+    <string name="speak">Говорите, пожалуйста</string>
+    <string name="edit_error">Изменения не могут быть пустыми!</string>
+    <string name="edit_error_second">Операция по изменению отклонена!</string>
+    <string name="speech_input">Голосовой ввод запущен!</string>
+    <string name="share_note">Поделиться заметкой</string>
+    <string name="speech_input_second">Голосовой ввод завершен!</string>
 </resources>
