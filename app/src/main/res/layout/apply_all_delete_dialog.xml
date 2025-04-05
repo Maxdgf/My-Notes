@@ -8,6 +8,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        app:srcCompat="@android:drawable/ic_menu_delete" />
+        android:layout_marginTop="50dp"
+        app:srcCompat="@drawable/note_icon_delete" />
 
 </LinearLayout>
