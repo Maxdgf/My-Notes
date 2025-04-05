@@ -32,4 +32,12 @@
     <string name="enter_name">enter note name</string>
     <string name="enter_content">enter note content</string>
     <string name="not_found">notes not found:</string>
+    <string name="clear_all">clear</string>
+    <string name="customization">customization</string>
+    <string name="speak">Speak, please</string>
+    <string name="edit_error">Changes cannot be empty!</string>
+    <string name="edit_error_second">Operation for changes failed!</string>
+    <string name="speech_input">Speech input activated!</string>
+    <string name="share_note">Share note</string>
+    <string name="speech_input_second">Speech input ended!</string>
 </resources>
