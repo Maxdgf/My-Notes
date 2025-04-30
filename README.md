@@ -4,7 +4,7 @@
 
 ### Stylish Note-Taking Application for Android
 
-My-Notes is an intuitive Android application designed to help you create stylish and personalized notes. With a variety of features, this app provides an easy and enjoyable way to keep track of your thoughts and ideas.
+📂My-Notes is an intuitive Android application designed to help you create stylish and personalized notes. With a variety of features, this app provides an easy and enjoyable way to keep track of your thoughts and ideas.
 
 ## 🌟Features
 
