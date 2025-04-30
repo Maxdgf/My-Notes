@@ -13,6 +13,13 @@ My-Notes is an intuitive Android application designed to help you create stylish
 - Custom Text Sections: Highlight parts of your text in different colors for emphasis.
 - Font Selection: Pick from various font styles to give your notes a unique look.
 
+| Description      | Screenshot                    |
+|------------------|-------------------------------|
+| Main Screen    | <img src="appScreenShots/main_screen.jpg" width="200"> |
+| Note Creation Screen     | <img src="appScreenShots/note_creation.jpg" width="200"> |
+| Note Editing Screen   | <img src="appScreenShots/note_editing.jpg" width="200"> |
+| Note Viewing Screen   | <img src="appScreenShots/note_viewing.jpg" width="200"> |
+
 ## 🦾Additional Functionality
 
 - ✏️Edit Notes: Easily modify your notes at any time.
