@@ -29,6 +29,7 @@ My-Notes is an intuitive Android application designed to help you create stylish
 - 🔍Search System: Quickly find notes by title with our efficient search feature.
 - 🎤Create Notes By Voice: Create notes quickly with your voice.
 - 🔁Share notes: Share your notes quickly in one click.
+- 💾Link recognition: Automatic link recognition when creating a note.
 
 ## 📄Implementation
 
