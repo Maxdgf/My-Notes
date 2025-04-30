@@ -1,4 +1,4 @@
-![Logo](<img src="app_icon.png" width="200"> )
+![Logo](app_icon.png)
 
 # My-Notes
 
