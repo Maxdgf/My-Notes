@@ -18,6 +18,10 @@
 | Note Editing Screen   | <img src="appScreenShots/note_editing.jpg" width="200"> |
 | Note Viewing Screen   | <img src="appScreenShots/note_viewing.jpg" width="200"> |
 
+## 🌎App localization:
+
+App supports Russian and English languages.
+
 ## 🦾Additional Functionality
 
 - ✏️Edit Notes: Easily modify your notes at any time.
