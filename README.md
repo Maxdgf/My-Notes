@@ -1,6 +1,4 @@
-![Logo](app_icon.png)
-
-# My-Notes
+h1>MyNotes <img style="margin-right: 5px; width: 50px; height: 50px;" src="app/src/main/appIcon.png"></h1>
 
 ### Stylish Note-Taking Application for Android
 
